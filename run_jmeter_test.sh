@@ -1,9 +1,15 @@
 #!/bin/bash
 
-SERVICE_CODE="${SERVICE_CODE:-mobius-utility-service}"
-JMX_PATH="/mobius-performance-testing/blob/sanity-suite/bob-camunda-quarkus.jmx"
-REPORT_DIR="sanity-reports"
-JMX_RESULTS_FILE="$REPORT_DIR/statistics.json"
+#SERVICE_CODE="${SERVICE_CODE:-mobius-utility-service}"
+#JMX_PATH="/mobius-performance-testing/blob/sanity-suite/bob-camunda-quarkus.jmx"
+#REPORT_DIR="sanity-reports"
+#JMX_RESULTS_FILE="$REPORT_DIR/statistics.json"
+
+SERVICE_CODE=$SERVICE_CODE
+K8_REPO_ACCESS_SECRET=$K8_REPO_ACCESS_SECRET
+REPO_URL=$REPO_URL
+K8S_FILES_PATH=$K8S_FILES_PATH
+BACKUP_FILE=$BACKUP_FILE
 
 # Check if the JMX script exists
 if [ -f "$JMX_PATH" ]; then
