@@ -1,9 +1,16 @@
 #!/bin/bash
 
-SERVICE_CODE="mobius-utility-service"  # Provided service code
-GITHUB_SHA="54764c1031108a56add6ade4d0a5b03902930d26"  # Provided commit SHA
-MAX_RETRIES=3
-SLEEP_DURATION=120
+#SERVICE_CODE="mobius-utility-service"  # Provided service code
+#GITHUB_SHA="54764c1031108a56add6ade4d0a5b03902930d26"  # Provided commit SHA
+#MAX_RETRIES=3
+#SLEEP_DURATION=120
+
+SERVICE_CODE=$SERVICE_CODE
+GITHUB_SHA=$GITHUB_SHA
+MAX_RETRIES=$MAX_RETRIES
+SLEEP_DURATION=$SLEEP_DURATION
+
+
 
 echo "Verifying pod status for service: $SERVICE_CODE with SHA: $GITHUB_SHA"
 
