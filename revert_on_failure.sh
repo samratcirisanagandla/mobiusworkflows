@@ -1,11 +1,17 @@
 #!/bin/bash
 
 # Variables
-SERVICE_CODE="mobius-utility-service"  # Provided service code
-K8_REPO_ACCESS_SECRET="$K8_REPO_ACCESS_SECRET"  # Access secret from environment variable
-REPO_URL="https://api.github.com/repos/gaiangroup/k8s-files-master/contents/helm/"  # Provided repo URL
-K8S_FILES_PATH="helm/$SERVICE_CODE/values.yaml"  # Path to values.yaml in the repository
-BACKUP_FILE="values_backup.yaml"  # Backup file for restoration
+#SERVICE_CODE="mobius-utility-service"  # Provided service code
+#K8_REPO_ACCESS_SECRET="$K8_REPO_ACCESS_SECRET"  # Access secret from environment variable
+#REPO_URL="https://api.github.com/repos/gaiangroup/k8s-files-master/contents/helm/"  # Provided repo URL
+#K8S_FILES_PATH="helm/$SERVICE_CODE/values.yaml"  # Path to values.yaml in the repository
+#BACKUP_FILE="values_backup.yaml"  # Backup file for restoration
+
+SERVICE_CODE=$SERVICE_CODE
+K8_REPO_ACCESS_SECRET=$K8_REPO_ACCESS_SECRET
+REPO_URL=$REPO_URL
+K8S_FILES_PATH=$K8S_FILES_PATH
+BACKUP_FILE=$BACKUP_FILE
 
 # Function to exit with an error message
 function exit_with_error() {
