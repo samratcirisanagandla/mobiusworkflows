@@ -1,69 +1,37 @@
 #!/bin/bash
 
-# Variables
-#SERVICE_CODE="mobius-utility-service"  # Provided service code
-#K8_REPO_ACCESS_SECRET="$K8_REPO_ACCESS_SECRET"  # Access secret from environment variable
-#REPO_URL="https://api.github.com/repos/gaiangroup/k8s-files-master/contents/helm/"  # Provided repo URL
-#K8S_FILES_PATH="helm/$SERVICE_CODE/values.yaml"  # Path to values.yaml in the repository
-#BACKUP_FILE="values_backup.yaml"  # Backup file for restoration
+#SERVICE_CODE="${SERVICE_CODE:-mobius-utility-service}"  # Provided service code
+#WORKFLOW_STATUS="$2"  # Status of the workflow (e.g., success, failure, no_data, service_down, etc.)
+#WEBHOOK_URL="${WEBHOOK_URL:-https://chat.googleapis.com/v1/spaces/AAAAbkkpaIU/messages?key=AIzaSyDdI0hCZtE6vySjMm-WEfRq3CPzqKqqsHI&token=yYYoov7obNuUq86dW5E7RkHreUpcoROju45s_q7EIpM}"  # Webhook URL for Google Chat
+#ACTION_URL="${ACTION_URL:-https://github.com/my-repo/actions/runs/12345}"  # Link to the GitHub action or job run details
 
 SERVICE_CODE=$service_code
-K8_REPO_ACCESS_SECRET=$k8_repo_access_secret
-REPO_URL=$repo_url
-K8S_FILES_PATH=$k8s_files_path
-BACKUP_FILE="https://raw.githubusercontent.com/samratcirisanagandla/mobiusworkflows/main/scripts/values_backup.yaml"  # URL to the backup file
+WORKFLOW_STATUS=$workflow_status
+WEBHOOK_URL="https://chat.googleapis.com/v1/spaces/AAAAbkkpaIU/messages?key=AIzaSyDdI0hCZtE6vySjMm-WEfRq3CPzqKqqsHI&token=yYYoov7obNuUq86dW5E7RkHreUpcoROju45s_q7EIpM"  # Webhook URL for Google Chat
+ACTION_URL=$action_url  # Customize this URL with the actual GitHub action or pipeline link
 
-# Function to exit with an error message
-function exit_with_error() {
-    echo "ERROR: $1"
-    exit 1
-}
+# Define the message based on the workflow status
+case "$WORKFLOW_STATUS" in
+  "success")
+    MESSAGE=":white_check_mark: Workflow completed successfully for service: $SERVICE_CODE. [View Details]($ACTION_URL)"
+    ;;
+  "failure")
+    MESSAGE=":x: Workflow failed for service: $SERVICE_CODE. [View Details]($ACTION_URL)"
+    ;;
+  "no_data")
+    MESSAGE=":warning: No data received from the previous step for service: $SERVICE_CODE. [View Details]($ACTION_URL)"
+    ;;
+  "service_down")
+    MESSAGE=":warning: The service $SERVICE_CODE appears to be down or unreachable. [View Details]($ACTION_URL)"
+    ;;
+  *)
+    MESSAGE=":question: Unknown status for service: $SERVICE_CODE. [View Details]($ACTION_URL)"
+    ;;
+esac
 
-# Ensure the script is running in a Git repository
-if [ ! -d ".git" ]; then
-    exit_with_error "This is not a Git repository. Please run the script in the correct directory."
-fi
+# Send the notification to Google Chat
+curl -X POST "$WEBHOOK_URL" \
+  -H 'Content-Type: application/json' \
+  -d "{\"text\": \"$MESSAGE\"}"
 
-# Ensure the K8_REPO_ACCESS_SECRET is set
-if [ -z "$K8_REPO_ACCESS_SECRET" ]; then
-    exit_with_error "K8_REPO_ACCESS_SECRET environment variable is not set. Please set it before running the script."
-fi
-
-# Revert the code to the previous commit
-echo "Reverting code to the previous commit due to failure..."
-git fetch --all || exit_with_error "Failed to fetch the latest changes from the remote repository."
-git reset --hard HEAD~1 || exit_with_error "Failed to reset the repository to the previous commit."
-git push --force || exit_with_error "Failed to push the reverted commit to the remote repository."
-
-# Download the backup file from GitHub (using raw URL)
-curl -o values_backup.yaml "$BACKUP_FILE" || exit_with_error "Failed to download the backup file from GitHub."
-
-# Restore values.yaml from the backup
-echo "Restoring values.yaml from the backup file..."
-SHA=$(curl -s -H "Authorization: Bearer $K8_REPO_ACCESS_SECRET" \
-              -H "Accept: application/vnd.github.v3+json" \
-              "$REPO_URL/$K8S_FILES_PATH?ref=prod" | jq -r .sha)
-
-if [ -z "$SHA" ]; then
-    exit_with_error "Failed to fetch the SHA of the existing values.yaml file from the GitHub repository."
-fi
-
-# Base64 encode the downloaded backup file
-NEW_CONTENT=$(base64 -w 0 "values_backup.yaml")
-if [ -z "$NEW_CONTENT" ]; then
-    exit_with_error "Failed to encode the backup file."
-fi
-
-# Update the values.yaml in the GitHub repository
-UPDATE_RESPONSE=$(curl -s -X PUT \
-  -H "Authorization: Bearer $K8_REPO_ACCESS_SECRET" \
-  -H "Content-Type: application/json" \
-  "$REPO_URL/$K8S_FILES_PATH" \
-  -d "{\"message\": \"Reverting values.yaml to backup\", \"content\": \"$NEW_CONTENT\", \"sha\": \"$SHA\", \"branch\": \"prod\"}")
-
-# Check if the update was successful
-if echo "$UPDATE_RESPONSE" | grep -q '"commit"'; then
-    echo "Successfully reverted values.yaml to the backup version."
-else
-    exit_with_error "Failed to update values.yaml in the repository. Response: $UPDATE_RESPONSE"
-fi
+echo "Notification sent to Google Chat with status: $WORKFLOW_STATUS."
