@@ -7,11 +7,11 @@
 #K8S_FILES_PATH="helm/$SERVICE_CODE/values.yaml"  # Path to values.yaml in the repository
 #BACKUP_FILE="values_backup.yaml"  # Backup file for restoration
 
-SERVICE_CODE=$SERVICE_CODE
-K8_REPO_ACCESS_SECRET=$K8_REPO_ACCESS_SECRET
-REPO_URL=$REPO_URL
-K8S_FILES_PATH=$K8S_FILES_PATH
-BACKUP_FILE=$BACKUP_FILE
+SERVICE_CODE=$service_code
+K8_REPO_ACCESS_SECRET=$k8_repo_access_secret
+REPO_URL=$repo_url
+K8S_FILES_PATH=$k8s_files_path
+BACKUP_FILE=$backup_file
 
 # Function to exit with an error message
 function exit_with_error() {
