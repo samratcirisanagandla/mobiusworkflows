@@ -5,10 +5,10 @@
 #WEBHOOK_URL="${WEBHOOK_URL:-https://chat.googleapis.com/v1/spaces/AAAAbkkpaIU/messages?key=AIzaSyDdI0hCZtE6vySjMm-WEfRq3CPzqKqqsHI&token=yYYoov7obNuUq86dW5E7RkHreUpcoROju45s_q7EIpM}"
 #ACTION_URL="${ACTION_URL:-https://github.com/my-repo/actions/runs/12345}"
 
-SERVICE_CODE=$SERVICE_CODE
-WORKFLOW_STATUS=$WORKFLOW_STATUS
-WEBHOOK_URL=$WEBHOOK_URL
-ACTION_URL=$ACTION_URL
+SERVICE_CODE=$service_code
+WORKFLOW_STATUS=$workflow_status
+WEBHOOK_URL=$webhook_url
+ACTION_URL=$action_url
 
 
 if [ "$WORKFLOW_STATUS" == "success" ]; then
