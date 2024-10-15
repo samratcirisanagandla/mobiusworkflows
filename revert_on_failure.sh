@@ -11,7 +11,7 @@ SERVICE_CODE=$service_code
 K8_REPO_ACCESS_SECRET=$k8_repo_access_secret
 REPO_URL=$repo_url
 K8S_FILES_PATH=$k8s_files_path
-BACKUP_FILE=$backup_file
+BACKUP_FILE="https://raw.githubusercontent.com/samratcirisanagandla/mobiusworkflows/main/scripts/values_backup.yaml"  # URL to the backup file
 
 # Function to exit with an error message
 function exit_with_error() {
@@ -35,10 +35,8 @@ git fetch --all || exit_with_error "Failed to fetch the latest changes from the 
 git reset --hard HEAD~1 || exit_with_error "Failed to reset the repository to the previous commit."
 git push --force || exit_with_error "Failed to push the reverted commit to the remote repository."
 
-# Check if the backup file exists
-if [ ! -f "$BACKUP_FILE" ]; then
-    exit_with_error "Backup file $BACKUP_FILE not found. Cannot restore values.yaml."
-fi
+# Download the backup file from GitHub (using raw URL)
+curl -o values_backup.yaml "$BACKUP_FILE" || exit_with_error "Failed to download the backup file from GitHub."
 
 # Restore values.yaml from the backup
 echo "Restoring values.yaml from the backup file..."
@@ -50,8 +48,8 @@ if [ -z "$SHA" ]; then
     exit_with_error "Failed to fetch the SHA of the existing values.yaml file from the GitHub repository."
 fi
 
-# Base64 encode the backup file
-NEW_CONTENT=$(base64 -w 0 "$BACKUP_FILE")
+# Base64 encode the downloaded backup file
+NEW_CONTENT=$(base64 -w 0 "values_backup.yaml")
 if [ -z "$NEW_CONTENT" ]; then
     exit_with_error "Failed to encode the backup file."
 fi
